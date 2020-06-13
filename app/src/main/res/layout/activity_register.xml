@@ -1,9 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity">
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/register_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        app:title="회원가입"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이름"
+        android:textSize="18dp"
+        android:textColor="#020202"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:id="@+id/register_name"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:hint="이름을 입력해주세요"
+        android:inputType="textPassword"
+        android:padding="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="학번 or 사번"
+        android:textSize="18dp"
+        android:textColor="#020202"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/register_num"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:hint="학번 또는 사번을 입력해주세요"
+            android:inputType="textPassword"
+            android:padding="10dp"/>
+
+        <Button
+            android:id="@+id/register_num_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="인증"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="20dp"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:text="* 학생은 학번, 교수는 사번을 입력하세요"
+        android:textStyle="bold"
+        android:textSize="12dp"
+        android:textColor="#FF0303"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이메일"
+        android:textSize="18dp"
+        android:textColor="#020202"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/register_email"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:hint="이메일을 입력해주세요"
+            android:inputType="textPassword"
+            android:padding="10dp"/>
+
+        <Button
+            android:id="@+id/check_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="중복확인"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="20dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="비밀번호"
+        android:textSize="18dp"
+        android:textColor="#020202"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/register_pw"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:hint="비밀번호를 입력해주세요"
+            android:inputType="textPassword"
+            android:padding="10dp"/>
+
+        <TextView
+            android:id="@+id/register_pw_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/register_pw2"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:hint="비밀번호 확인"
+            android:inputType="textPassword"
+            android:padding="10dp"/>
+
+        <TextView
+            android:id="@+id/register_pw2_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/register_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:layout_gravity="center"
+
+        android:background="#3EBEE8"
+        android:text="가입"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"/>
+
+
+</LinearLayout>
