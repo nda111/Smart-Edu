@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1038486289945",
+    "firebase_url": "https://smartedu-17878.firebaseio.com",
+    "project_id": "smartedu-17878",
+    "storage_bucket": "smartedu-17878.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038486289945:android:92a45d19e2133d1a013488",
+        "android_client_info": {
+          "package_name": "com.gachon.smartedu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1038486289945-r8v6pgj6m6ugqf9f3h3g7gq9sa84tqio.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gachon.smartedu",
+            "certificate_hash": "757782d5ae0e4767224b481662332aafe0c77508"
+          }
+        },
+        {
+          "client_id": "1038486289945-i7gc8duboq7404020k0n6mjm8k6ilbcj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpGs3ouOC6vo0mAxEvpen7fRUs0N_qK74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1038486289945-i7gc8duboq7404020k0n6mjm8k6ilbcj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

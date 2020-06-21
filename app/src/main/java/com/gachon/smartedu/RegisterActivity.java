@@ -1,32 +1,50 @@
 package com.gachon.smartedu;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText register_pw, register_pw2;
+    private EditText register_email, register_pw, register_pw2;
     private TextView register_pw_check, register_pw2_check;
     private Button register_num_check, check_id, register_btn;
+
+    private FirebaseAuth mAuth;
+    private static final String TAG = "RegisterActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
         // 툴바에 뒤로가기 버튼 만들기
         Toolbar toolBar = (Toolbar) findViewById(R.id.register_toolbar);
         setSupportActionBar(toolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //이메일
+        register_email = (EditText) findViewById(R.id.register_email);
 
         // 비밀번호
         register_pw = (EditText) findViewById(R.id.register_pw);
@@ -112,17 +130,50 @@ public class RegisterActivity extends AppCompatActivity {
 //            }
 //        });
 //
-//        // 가입 버튼
-//        register_btn = (Button) findViewById(R.id.register_btn);
-//        register_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
+        // 가입 버튼
+        register_btn = (Button) findViewById(R.id.register_btn);
+        register_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                register();
+            }
+        });
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
+    }
 
+    //실질적으로 회원가입 진행
+    private void register() {
 
+        String email = register_email.getText().toString().trim();
+        String password = register_pw.getText().toString().trim();
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //UI
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            //UI
+                        }
+
+                        // ...
+                    }
+                });
     }
 
     // 툴바 뒤로가기 버튼 활성화
