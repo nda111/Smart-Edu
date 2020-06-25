@@ -36,7 +36,7 @@ public class LectureListActivity extends AppCompatActivity {
 
         Toolbar toolBar = findViewById(R.id.lectureList_toolbar);
         setSupportActionBar(toolBar);
-        toolBar.setTitle("");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         for (int i=0; i < 20; i++){

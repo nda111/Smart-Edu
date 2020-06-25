@@ -25,9 +25,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Smart Edu"
+                    android:textAlignment="gravity"
                     android:textColor="#03A9F4"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
             </androidx.appcompat.widget.Toolbar>
 
@@ -44,6 +45,53 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_gravity="bottom">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_weight="1">
+                    <ImageButton
+                        android:id="@+id/community_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_community"
+                        android:background="@drawable/community_pressed"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_weight="1">
+                    <ImageButton
+                        android:id="@+id/message_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_message"
+                        android:background="@drawable/message_pressed"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_weight="1">
+                    <ImageButton
+                        android:id="@+id/add_lecture_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/add_lecture_pressed"
+                        android:src="@drawable/ic_add_lecture"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"/>
+                </LinearLayout>
 
 
             </LinearLayout>
