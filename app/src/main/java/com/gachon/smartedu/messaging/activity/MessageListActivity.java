@@ -3,6 +3,7 @@ package com.gachon.smartedu.messaging.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.solver.widgets.Snapshot;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,9 +18,19 @@ import com.gachon.smartedu.R;
 import com.gachon.smartedu.messaging.Message;
 import com.gachon.smartedu.messaging.MessageListAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An activity that downloads and lists every messages corresponds to the account
@@ -30,12 +41,17 @@ import java.util.Calendar;
 public class MessageListActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_REQUEST_VIEW = 0x01;
+    private static final int ACTIVITY_REQUEST_SEND = 0x02;
 
     public static final int ACTIVITY_RESULT_NONE = 0x00;
     public static final int ACTIVITY_RESULT_DELETE = 0x01;
     public static final int ACTIVITY_RESULT_REPLY = 0x02;
+    public static final int ACTIVITY_RESULT_SEND = 0x03;
+
+    private final FirebaseDatabase Database = FirebaseDatabase.getInstance();
 
     private ArrayList<Message> messageList = new ArrayList<Message>();
+    private long MaxMessageId = -1;
 
     private RecyclerView messageListView;
     private TextView noMessageTextView;
@@ -65,6 +81,10 @@ public class MessageListActivity extends AppCompatActivity {
         @Override
         public void onDeleteButtonClicked(@NonNull Message message) {
             // todo: request deletion
+            final String MyId = getMyId();
+            final DatabaseReference ref = Database.getReference().child("messaging");
+            ref.child(MyId).child(Long.toString(message.getId())).removeValue();
+
             Toast.makeText(MessageListActivity.this, "Delete clicked", Toast.LENGTH_SHORT).show();
         }
     };
@@ -93,7 +113,7 @@ public class MessageListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(MessageListActivity.this, SendMessageActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, ACTIVITY_REQUEST_SEND);
             }
         });
     }
@@ -120,6 +140,54 @@ public class MessageListActivity extends AppCompatActivity {
                 }
                 break;
 
+            case ACTIVITY_REQUEST_SEND:
+                switch (resultCode) {
+
+                    case ACTIVITY_RESULT_SEND:
+                        DatabaseReference ref = Database.getReference("messaging");
+                        ref = ref.child(hashEmail(data.getStringExtra("TO")));
+
+                        final Message msg = Message.unpack(data.getExtras());
+                        final DatabaseReference postBox = ref;
+                        ref.orderByKey().limitToLast(1).addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                                final Long id = snapshot.child(Message.KEY_ID).getValue(Long.class) + 1;
+
+                                HashMap<String, Object> input = new HashMap<String, Object>();
+                                input.put(Message.KEY_FROM, getMyId());
+                                input.put(Message.KEY_TITLE, msg.getTitle());
+                                input.put(Message.KEY_CONTENT, msg.getContent());
+                                input.put(Message.KEY_WHEN, msg.getWhen());
+
+                                DatabaseReference ref = postBox.child(id.toString());
+                                ref.updateChildren(input);
+                            }
+
+                            @Override
+                            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                            }
+
+                            @Override
+                            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                            }
+
+                            @Override
+                            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            }
+                        });
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
             default:
                 break;
         }
@@ -129,30 +197,94 @@ public class MessageListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        downloadMessages();
+        /*
+         * Start realtime messaging
+         */
+        final String MyId = getMyId();
+        final DatabaseReference messageReference = Database.getReference("messaging").child(MyId);
+        messageReference.orderByKey().addChildEventListener(new ChildEventListener() {
+
+            private HashMap<Long, Message> messages = new HashMap<Long, Message>();
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                final long id = Long.valueOf(snapshot.getKey());
+                MaxMessageId = Math.max(MaxMessageId, id);
+
+                final String title = snapshot.child(Message.KEY_TITLE).getValue(String.class);
+                final String from = snapshot.child(Message.KEY_FROM).getValue(String.class);
+                final Long when = snapshot.child(Message.KEY_WHEN).getValue(Long.class);
+                final String content = snapshot.child(Message.KEY_CONTENT).getValue(String.class);
+
+                final Message msg = new Message(id, from, title, content, when);
+                messages.put(id, msg);
+
+                refreshMessageList();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                /* EMPTY */
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                final long id = Long.valueOf(snapshot.getKey());
+                messages.remove(id);
+                refreshMessageList();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                /* EMPTY */
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                /* EMPTY */
+            }
+
+            private void refreshMessageList() {
+
+                messageList.clear();
+                for (Map.Entry<Long, Message> entry : messages.entrySet()) {
+                    messageList.add(entry.getValue());
+                }
+
+                final MessageListAdapter adapter = new MessageListAdapter(messageList);
+                adapter.setOnClickedListener(onItemClickedListener);
+                messageListView.setAdapter(adapter);
+
+                noMessageTextView.setVisibility(messageList.size() == 0 ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
-    private void downloadMessages() {
+    private String getMyId() {
+        // return FirebaseAuth.getInstance().getUid();
+        return hashEmail("abcdef@naver.com");
+    }
 
-        final Calendar today = Calendar.getInstance();
-        final Calendar yesterday = Calendar.getInstance();
-        yesterday.add(Calendar.DAY_OF_MONTH, -1);
+    private String hashEmail(@NonNull String email) {
 
-        final Message[] messages = new Message[] {
-                new Message(0, "from A", "abcdef@abab.com", "Title1", "This is the first content.", today.getTimeInMillis()),
-                new Message(1, "from B", "ghijkl@cdcd.net", "Title2", "This is the second content.", yesterday.getTimeInMillis()),
-        };
-        // todo: receive message
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(email.getBytes());
 
-        messageList.clear();
-        for (Message msg : messages) {
-            messageList.add(msg);
+            byte[] bytes = digest.digest();
+            StringBuilder builder = new StringBuilder();
+            final String HexString = "0123456789ABCDEF";
+            for (byte b : bytes) {
+                builder.append(HexString.charAt((b >> 4) & 0xF));
+                builder.append(HexString.charAt(b & 0xF));
+            }
+
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
 
-        final MessageListAdapter adapter = new MessageListAdapter(messageList);
-        adapter.setOnClickedListener(onItemClickedListener);
-        messageListView.setAdapter(adapter);
-
-        noMessageTextView.setVisibility(messageList.size() == 0 ? View.VISIBLE : View.GONE);
+        return null;
     }
 }
