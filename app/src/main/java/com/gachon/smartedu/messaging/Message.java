@@ -14,12 +14,11 @@ import java.util.Objects;
  */
 public final class Message {
 
-    private static final String KEY_ID = "id";
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_FROM = "from";
-    private static final String KEY_FROM_EMAIL = "email";
-    private static final String KEY_WHEN = "when";
-    private static final String KEY_CONTENT = "content";
+    public static final String KEY_ID = "id";
+    public static final String KEY_TITLE = "title";
+    public static final String KEY_FROM = "from";
+    public static final String KEY_WHEN = "when";
+    public static final String KEY_CONTENT = "content";
 
     /**
      * Unpack data from {Bundle}
@@ -31,7 +30,6 @@ public final class Message {
         if (!(bundle.containsKey(KEY_ID) &&
                 bundle.containsKey(KEY_TITLE) &&
                 bundle.containsKey(KEY_FROM) &&
-                bundle.containsKey(KEY_FROM_EMAIL) &&
                 bundle.containsKey(KEY_WHEN) &&
                 bundle.containsKey(KEY_CONTENT))) {
             return null;
@@ -40,7 +38,6 @@ public final class Message {
         return new Message(
                 bundle.getLong(KEY_ID),
                 Objects.requireNonNull(bundle.getString(KEY_FROM)),
-                Objects.requireNonNull(bundle.getString(KEY_FROM_EMAIL)),
                 Objects.requireNonNull(bundle.getString(KEY_TITLE)),
                 Objects.requireNonNull(bundle.getString(KEY_CONTENT)),
                 bundle.getLong(KEY_WHEN));
@@ -48,7 +45,6 @@ public final class Message {
 
     private long id;
     private String from;
-    private String fromEmail;
     private String title;
     private String content;
     private long when;
@@ -56,10 +52,9 @@ public final class Message {
     /**
      * Create an instance
      */
-    public Message(long id, @NonNull String from, @NonNull String fromEmail, @NonNull String title, @NonNull String content, long when) {
+    public Message(long id, @NonNull String from, @NonNull String title, @NonNull String content, long when) {
         this.id = id;
         this.from = from;
-        this.fromEmail = fromEmail;
         this.title = title;
         this.content = content;
         this.when = when;
@@ -73,6 +68,13 @@ public final class Message {
     }
 
     /**
+     * Set the ID
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /**
      * Get the name of sender
      */
     public String getFrom() {
@@ -80,10 +82,10 @@ public final class Message {
     }
 
     /**
-     * Get the email address of the sender
+     * Set the name of sender
      */
-    public String getFromEmail() {
-        return fromEmail;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     /**
@@ -116,7 +118,6 @@ public final class Message {
         bundle.putLong(KEY_ID, id);
         bundle.putString(KEY_TITLE, title);
         bundle.putString(KEY_FROM, from);
-        bundle.putString(KEY_FROM_EMAIL, fromEmail);
         bundle.putString(KEY_CONTENT, content);
         bundle.putLong(KEY_WHEN, when);
 
