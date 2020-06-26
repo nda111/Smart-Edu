@@ -7,6 +7,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -14,6 +15,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.gachon.smartedu.LectureListItem;
 import com.gachon.smartedu.R;
@@ -24,6 +28,7 @@ import java.util.List;
 
 public class LectureListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
+    private ImageButton add_lec_btn;
 
     List<LectureListItem> list = new ArrayList<>();
 
@@ -46,6 +51,17 @@ public class LectureListActivity extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(manager);recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(new RecyclerAdapter(list));
+
+        add_lec_btn = (ImageButton) findViewById(R.id.add_lecture_btn);
+
+        add_lec_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LectureListActivity.this, AddLectureActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 
