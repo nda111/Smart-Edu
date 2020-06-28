@@ -1,14 +1,20 @@
 package com.gachon.smartedu;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.gachon.smartedu.activity.AddLectureActivity;
+import com.gachon.smartedu.activity.LectureDetailActivity;
+import com.gachon.smartedu.activity.LectureListActivity;
 
 import java.util.List;
 
@@ -28,23 +34,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, final int position) {
-        holder.imageView.setImageResource(list.get(position).image);
         holder.textView1.setText(list.get(position).tv1);
         holder.textView2.setText(list.get(position).tv2);
 
-        holder.textView1.setOnClickListener(new View.OnClickListener() {
+        holder.lec_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), list.get(position).tv1, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(v.getContext(), LectureDetailActivity.class);
+                v.getContext().startActivity(intent);
             }
         });
 
-        holder.textView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), list.get(position).tv2, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -54,13 +54,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder>{
 }
 
 class RecyclerViewHolder extends RecyclerView.ViewHolder {
-    ImageView imageView;
     TextView textView1, textView2;
+    LinearLayout lec_item;
 
     public RecyclerViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        imageView = itemView.findViewById(R.id.img);
+        lec_item = itemView.findViewById(R.id.lec_item);
         textView1 = itemView.findViewById(R.id.tv1);
         textView2 = itemView.findViewById(R.id.tv2);
     }

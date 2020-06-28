@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.AddLectureActivity"></activity>
+        <activity android:name=".activity.LectureDetailActivity"></activity>
+        <activity android:name=".activity.AddLectureActivity" />
         <activity android:name=".activity.LectureListActivity" />
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.LoginActivity">

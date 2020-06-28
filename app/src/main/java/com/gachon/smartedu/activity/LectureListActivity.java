@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +30,8 @@ import java.util.List;
 public class LectureListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private ImageButton add_lec_btn;
+    private static final int add_lec_requestCode = 1;
+    private static final int add_lec_resultCode = 100;
 
     List<LectureListItem> list = new ArrayList<>();
 
@@ -39,26 +42,22 @@ public class LectureListActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.lecture_rv);
 
+        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(manager);recyclerView.setHasFixedSize(false);
+
         Toolbar toolBar = findViewById(R.id.lectureList_toolbar);
         setSupportActionBar(toolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        for (int i=0; i < 20; i++){
-            list.add(new LectureListItem(R.mipmap.ic_launcher, "list " + i + "번째", "값 " + i));
-        }
-
-        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(manager);recyclerView.setHasFixedSize(false);
-        recyclerView.setAdapter(new RecyclerAdapter(list));
-
+        // 강의 추가 버튼 입력 이벤트
         add_lec_btn = (ImageButton) findViewById(R.id.add_lecture_btn);
 
         add_lec_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LectureListActivity.this, AddLectureActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, add_lec_requestCode);
             }
         });
 
@@ -89,6 +88,26 @@ public class LectureListActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    // AddLectureActivity result 받아오기
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == add_lec_requestCode && resultCode == add_lec_resultCode) {
+            // Professor: 받아온 result로 lecture 생성
+//            if(professor == true)
+            list.add(new LectureListItem(data.getStringExtra("LectureName"),
+                    "학점: " + data.getStringExtra("Credit") +
+                    " / 학생정원: " + data.getStringExtra("MaxNum")));
+
+            recyclerView.setAdapter(new RecyclerAdapter(list));
+
+
+        }
+    }
+
+
 
 
 }

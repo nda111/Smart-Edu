@@ -5,19 +5,11 @@ public class LectureListItem {
     String tv1;
     String tv2;
 
-    public LectureListItem(int image, String tv1, String tv2){
-        this.image = image;
+    public LectureListItem(String tv1, String tv2){
         this.tv1 = tv1;
         this.tv2 = tv2;
     }
 
-    public int getImage() {
-        return image;
-    }
-
-    public void setImage(int image) {
-        this.image = image;
-    }
 
     public String getTv1() {
         return tv1;

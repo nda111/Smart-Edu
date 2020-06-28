@@ -7,39 +7,33 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         app:cardCornerRadius="10dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/img"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-
             <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/lec_item"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="3"
+                android:background="@drawable/lecture_pressed"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="2"/>
                 <TextView
                     android:id="@+id/tv2"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_weight="1"/>
+
             </LinearLayout>
 
-        </LinearLayout>
 
 
     </androidx.cardview.widget.CardView>
