@@ -1,28 +1,12 @@
 package com.gachon.smartedu.Item;
 
 public class LectureListItem {
-    public String tv1;
-    public String tv2;
+    public String name;
+    public String lecture_info;
 
-    public LectureListItem(String tv1, String tv2){
-        this.tv1 = tv1;
-        this.tv2 = tv2;
-    }
-
-
-    public String getTv1() {
-        return tv1;
-    }
-
-    public void setTv1(String tv1) {
-        this.tv1 = tv1;
-    }
-
-    public String getTv2() {
-        return tv2;
-    }
-
-    public void setTv2(String tv2) {
-        this.tv2 = tv2;
+    // Firebase 데이터 에서 LID = LectureID 가져와야함
+    public LectureListItem(String name, String lecture_info){
+        this.name = name;
+        this.lecture_info = lecture_info;
     }
 }
