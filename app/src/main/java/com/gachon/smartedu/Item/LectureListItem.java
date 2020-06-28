@@ -1,9 +1,8 @@
-package com.gachon.smartedu;
+package com.gachon.smartedu.Item;
 
 public class LectureListItem {
-    int image;
-    String tv1;
-    String tv2;
+    public String tv1;
+    public String tv2;
 
     public LectureListItem(String tv1, String tv2){
         this.tv1 = tv1;

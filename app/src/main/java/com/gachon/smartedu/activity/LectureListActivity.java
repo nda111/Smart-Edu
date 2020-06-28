@@ -8,21 +8,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
-import com.gachon.smartedu.LectureListItem;
+import com.gachon.smartedu.Item.LectureListItem;
 import com.gachon.smartedu.R;
-import com.gachon.smartedu.RecyclerAdapter;
+import com.gachon.smartedu.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
