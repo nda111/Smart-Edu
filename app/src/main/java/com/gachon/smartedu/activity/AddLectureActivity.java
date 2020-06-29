@@ -16,10 +16,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.gachon.smartedu.R;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class AddLectureActivity extends AppCompatActivity {
     private Button add_btn;
     private static final int add_lec_resultCode = 100;
+    private final FirebaseDatabase Database = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -18,13 +18,14 @@ import android.widget.ImageButton;
 import com.gachon.smartedu.Item.LectureListItem;
 import com.gachon.smartedu.R;
 import com.gachon.smartedu.adapter.RecyclerAdapter;
+import com.gachon.smartedu.messaging.activity.MessageListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LectureListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
-    private ImageButton add_lec_btn;
+    private ImageButton add_lec_btn, message_btn;
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
 
@@ -53,6 +54,17 @@ public class LectureListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(LectureListActivity.this, AddLectureActivity.class);
                 startActivityForResult(intent, add_lec_requestCode);
+            }
+        });
+
+        // 메시지 버튼 입력 이벤트
+        message_btn = (ImageButton) findViewById(R.id.message_btn);
+
+        message_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LectureListActivity.this, MessageListActivity.class);
+                startActivity(intent);
             }
         });
 

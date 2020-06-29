@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,13 +22,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText register_email, register_pw, register_pw2;
+    private EditText register_email, register_pw, register_pw2, register_name, register_num;
     private TextView register_pw_check, register_pw2_check;
-    private Button register_num_check, check_id, register_btn;
-
+    private Button register_num_check, register_btn;
+    private String userinfo; //교수인지 학생인지 구분
+    private Integer check_info = 0; // 학번 인증 통과시 1로 변환
     private FirebaseAuth mAuth;
     private static final String TAG = "RegisterActivity";
 
@@ -38,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
 
         // 툴바에 뒤로가기 버튼 만들기
         Toolbar toolBar = (Toolbar) findViewById(R.id.register_toolbar);
@@ -54,6 +61,40 @@ public class RegisterActivity extends AppCompatActivity {
         register_pw_check = (TextView) findViewById(R.id.register_pw_check);
         register_pw2_check = (TextView) findViewById(R.id.register_pw2_check);
 
+        // 이름
+        register_name = (EditText) findViewById(R.id.register_name);
+
+        // 학번 or 교수번호
+        register_num = (EditText) findViewById(R.id.register_num);
+
+        // 학번 or 교수번호 인증
+        register_num_check = (Button) findViewById(R.id.register_num_check);
+
+        register_num_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(register_num.length() == 9)
+                {
+                    userinfo = "학생";
+                    check_info = 1;
+                    Toast.makeText(RegisterActivity.this, "학생인증완료",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else if(register_num.length() == 4)
+                {
+                    userinfo = "교수";
+                    check_info = 1;
+                    Toast.makeText(RegisterActivity.this, "교수인증완료",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    check_info = 0;
+                    Toast.makeText(RegisterActivity.this, "인증실패",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
         // 비밀번호는 4자리 이상만 가능
         register_pw.addTextChangedListener(new TextWatcher() {
@@ -65,10 +106,10 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if(register_pw.getText().length() > 0 && register_pw.getText().length() < 4) {
-                    register_pw_check.setText("4자리 이상 입력하세요");
+                if(register_pw.getText().length() > 0 && register_pw.getText().length() < 6) {
+                    register_pw_check.setText("6자리 이상 입력하세요");
                 }
-                else if(register_pw.getText().length() >= 4) {
+                else if(register_pw.getText().length() >= 6) {
                     register_pw_check.setText("사용가능");
                 }
                 else if(register_pw.getText().length() == 0) {
@@ -154,27 +195,82 @@ public class RegisterActivity extends AppCompatActivity {
 
         String email = register_email.getText().toString().trim();
         String password = register_pw.getText().toString().trim();
+        String passwordCheck = register_pw2.getText().toString().trim();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //UI
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            //UI
+
+        if (register_name.length() < 1) {
+            Toast.makeText(RegisterActivity.this, "이름을 입력해주세요",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else if (check_info == 0){
+            Toast.makeText(RegisterActivity.this, "학번 or 사번 인증을 해주세요",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else if (email.length() < 1) {
+            Toast.makeText(RegisterActivity.this, "이메일을 입력해주세요",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else if(password.length() < 6 ) {
+            Toast.makeText(RegisterActivity.this, "올바른 비밀번호를 설정해주세요",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        } else if(password.equals(passwordCheck)) {
+
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "createUserWithEmail:success");
+
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                String email = user.getEmail();
+                                String uid = user.getUid();
+                                String name = register_name.getText().toString().trim();
+                                String reg_num = register_num.getText().toString().trim();
+                                String userposition = userinfo;
+
+                                // Save the table in firebase DB
+                                HashMap<Object,String> hashMap = new HashMap<>();
+
+                                hashMap.put("uid", uid);
+                                hashMap.put("email", email);
+                                hashMap.put("name", name);
+                                hashMap.put("identification number", reg_num);
+                                hashMap.put("user position",userposition);
+
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference reference = database.getReference("Users");
+                                reference.child(uid).setValue(hashMap);
+
+                                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(RegisterActivity.this, "회원가입 성공!", Toast.LENGTH_SHORT).show();
+                                finish();
+
+
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.e(TAG, "createUserWithEmail:failure", task.getException());
+                                Toast.makeText(RegisterActivity.this, "중복된 아이디 혹은 이메일 형식이 아닙니다",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                         }
+                    });
+        }
+        else {
+            Toast.makeText(RegisterActivity.this, "비밀번호를 확인해주세요",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                        // ...
-                    }
-                });
+
     }
 
     // 툴바 뒤로가기 버튼 활성화
