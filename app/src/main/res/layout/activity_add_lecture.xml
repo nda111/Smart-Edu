@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/add_lecture_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        app:title="강의 추가"/>
+
+    <!--   Professor   -->
+    <LinearLayout
+        android:id="@+id/pfs_add_lec"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="강의명"
+            android:textSize="18dp"
+            android:textColor="#020202"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/lecture_name"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:hint="개설하실 강의명을 입력해주세요"
+            android:inputType="textPersonName"
+            android:padding="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학점"
+            android:textSize="18dp"
+            android:textColor="#020202"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"/>
+        <Spinner
+            android:id="@+id/credit_spinener"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="평가방법"
+            android:textSize="18dp"
+            android:textColor="#020202"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"/>
+
+        <Spinner
+            android:id="@+id/gd_policy_spinener"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학생정원"
+            android:textSize="18dp"
+            android:textColor="#020202"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/max_stu_num"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:hint="정원수"
+                android:inputType="text|numberDecimal"
+                android:padding="10dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="명"
+                android:textColor="#000000"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/add_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dip"
+            android:background="#3EBEE8"
+            android:text="강의 개설"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            />
+    </LinearLayout>
+
+
+   <!--   Student   -->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/std_add_lec"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="vertical">-->
+
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/add_lecture_rv"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="7"-->
+<!--            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>-->
+
+
+<!--    </LinearLayout>-->
+
+
+
+</LinearLayout>

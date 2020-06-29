@@ -1,4 +1,4 @@
-package com.gachon.smartedu;
+package com.gachon.smartedu.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gachon.smartedu.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -89,6 +90,10 @@ public class LoginActivity extends AppCompatActivity {
                                 // Name
                                 String name = user.getDisplayName();
                                 Toast.makeText(LoginActivity.this, name, Toast.LENGTH_SHORT).show();
+                                // Call LectureList Activity
+                                Intent intent = new Intent(LoginActivity.this, LectureListActivity.class);
+                                startActivity(intent);
+                                finish();
                             }
                             //UI
                         } else {
