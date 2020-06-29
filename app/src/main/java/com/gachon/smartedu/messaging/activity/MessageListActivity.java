@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,17 +76,14 @@ public class MessageListActivity extends AppCompatActivity {
             final Intent intent = new Intent(MessageListActivity.this, SendMessageActivity.class);
             intent.putExtras(message.toBundle());
 
-            startActivity(intent);
+            startActivityForResult(intent, ACTIVITY_REQUEST_SEND);
         }
 
         @Override
         public void onDeleteButtonClicked(@NonNull Message message) {
-            // todo: request deletion
-            final String MyId = getMyId();
+            final String MyId = hashEmail(getMyId());
             final DatabaseReference ref = Database.getReference().child("messaging");
-            ref.child(MyId).child(Long.toString(message.getId())).removeValue();
-
-            Toast.makeText(MessageListActivity.this, "Delete clicked", Toast.LENGTH_SHORT).show();
+            ref.child(MyId).child(message.getId()).removeValue();
         }
     };
 
@@ -144,43 +142,23 @@ public class MessageListActivity extends AppCompatActivity {
                 switch (resultCode) {
 
                     case ACTIVITY_RESULT_SEND:
+                    case ACTIVITY_RESULT_REPLY:
                         DatabaseReference ref = Database.getReference("messaging");
                         ref = ref.child(hashEmail(data.getStringExtra("TO")));
 
                         final Message msg = Message.unpack(data.getExtras());
                         final DatabaseReference postBox = ref;
-                        ref.orderByKey().limitToLast(1).addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                                final Long id = snapshot.child(Message.KEY_ID).getValue(Long.class) + 1;
+                        final String id = hashNow();
+                        HashMap<String, Object> input = new HashMap<String, Object>();
+                        input.put(Message.KEY_FROM, getMyId());
+                        input.put(Message.KEY_TITLE, msg.getTitle());
+                        input.put(Message.KEY_CONTENT, msg.getContent());
+                        input.put(Message.KEY_WHEN, msg.getWhen());
 
-                                HashMap<String, Object> input = new HashMap<String, Object>();
-                                input.put(Message.KEY_FROM, getMyId());
-                                input.put(Message.KEY_TITLE, msg.getTitle());
-                                input.put(Message.KEY_CONTENT, msg.getContent());
-                                input.put(Message.KEY_WHEN, msg.getWhen());
+                        ref = postBox.child(id);
+                        ref.updateChildren(input);
 
-                                DatabaseReference ref = postBox.child(id.toString());
-                                ref.updateChildren(input);
-                            }
-
-                            @Override
-                            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            }
-
-                            @Override
-                            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                            }
-
-                            @Override
-                            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                            }
-                        });
                         break;
 
                     default:
@@ -201,17 +179,15 @@ public class MessageListActivity extends AppCompatActivity {
          * Start realtime messaging
          */
         final String MyId = getMyId();
-        final DatabaseReference messageReference = Database.getReference("messaging").child(MyId);
+        final DatabaseReference messageReference = Database.getReference("messaging").child(hashEmail(MyId));
         messageReference.orderByKey().addChildEventListener(new ChildEventListener() {
 
-            private HashMap<Long, Message> messages = new HashMap<Long, Message>();
+            private HashMap<String, Message> messages = new HashMap<String, Message>();
 
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                final long id = Long.valueOf(snapshot.getKey());
-                MaxMessageId = Math.max(MaxMessageId, id);
-
+                final String id = snapshot.getKey();
                 final String title = snapshot.child(Message.KEY_TITLE).getValue(String.class);
                 final String from = snapshot.child(Message.KEY_FROM).getValue(String.class);
                 final Long when = snapshot.child(Message.KEY_WHEN).getValue(Long.class);
@@ -230,7 +206,7 @@ public class MessageListActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                final long id = Long.valueOf(snapshot.getKey());
+                final String id = snapshot.getKey();
                 messages.remove(id);
                 refreshMessageList();
             }
@@ -248,7 +224,7 @@ public class MessageListActivity extends AppCompatActivity {
             private void refreshMessageList() {
 
                 messageList.clear();
-                for (Map.Entry<Long, Message> entry : messages.entrySet()) {
+                for (Map.Entry<String, Message> entry : messages.entrySet()) {
                     messageList.add(entry.getValue());
                 }
 
@@ -262,8 +238,40 @@ public class MessageListActivity extends AppCompatActivity {
     }
 
     private String getMyId() {
-        // return FirebaseAuth.getInstance().getUid();
-        return hashEmail("abcdef@naver.com");
+        return FirebaseAuth.getInstance().getCurrentUser().getEmail();
+    }
+
+    private String hashNow() {
+
+        long now = Calendar.getInstance().getTimeInMillis();
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(new byte[] {
+                    (byte)((now >> 56) & 0xFF),
+                    (byte)((now >> 48) & 0xFF),
+                    (byte)((now >> 40) & 0xFF),
+                    (byte)((now >> 32) & 0xFF),
+                    (byte)((now >> 24) & 0xFF),
+                    (byte)((now >> 16) & 0xFF),
+                    (byte)((now >> 8) & 0xFF),
+                    (byte)((now) & 0xFF),
+            });
+
+            byte[] bytes = digest.digest();
+            StringBuilder builder = new StringBuilder();
+            final String HexString = "0123456789ABCDEF";
+            for (byte b : bytes) {
+                builder.append(HexString.charAt((b >> 4) & 0xF));
+                builder.append(HexString.charAt(b & 0xF));
+            }
+
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private String hashEmail(@NonNull String email) {

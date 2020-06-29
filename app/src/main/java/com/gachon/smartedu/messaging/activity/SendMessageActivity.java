@@ -1,21 +1,17 @@
 package com.gachon.smartedu.messaging.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.gachon.smartedu.R;
 import com.gachon.smartedu.messaging.Message;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.regex.Pattern;
 
@@ -81,11 +77,11 @@ public class SendMessageActivity extends AppCompatActivity {
                     return;
                 }
 
-                // todo: send message
-                Message message = new Message(-1, null, title, content, Calendar.getInstance().getTimeInMillis());
+                Message message = new Message(null, null, title, content, Calendar.getInstance().getTimeInMillis());
                 Intent intent = new Intent();
                 intent.putExtras(message.toBundle());
                 intent.putExtra("TO", to);
+
                 setResult(MessageListActivity.ACTIVITY_RESULT_SEND, intent);
                 finish();
             }

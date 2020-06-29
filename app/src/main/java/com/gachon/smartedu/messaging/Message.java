@@ -36,14 +36,14 @@ public final class Message {
         }
 
         return new Message(
-                bundle.getLong(KEY_ID),
-                Objects.requireNonNull(bundle.getString(KEY_FROM)),
+                bundle.getString(KEY_ID),
+                bundle.getString(KEY_FROM),
                 Objects.requireNonNull(bundle.getString(KEY_TITLE)),
                 Objects.requireNonNull(bundle.getString(KEY_CONTENT)),
                 bundle.getLong(KEY_WHEN));
     }
 
-    private long id;
+    private String id;
     private String from;
     private String title;
     private String content;
@@ -52,7 +52,7 @@ public final class Message {
     /**
      * Create an instance
      */
-    public Message(long id, @NonNull String from, @NonNull String title, @NonNull String content, long when) {
+    public Message(String id, String from, @NonNull String title, @NonNull String content, long when) {
         this.id = id;
         this.from = from;
         this.title = title;
@@ -63,14 +63,14 @@ public final class Message {
     /**
      * Get the ID
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Set the ID
      */
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -115,7 +115,7 @@ public final class Message {
     public Bundle toBundle() {
         final Bundle bundle = new Bundle();
 
-        bundle.putLong(KEY_ID, id);
+        bundle.putString(KEY_ID, id);
         bundle.putString(KEY_TITLE, title);
         bundle.putString(KEY_FROM, from);
         bundle.putString(KEY_CONTENT, content);
