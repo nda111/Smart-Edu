@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gachon.smartedu">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,8 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.RegisterLectureActivity"></activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".activity.AnnounceActivity"></activity>
+        <activity android:name=".activity.AnnounceActivity" />
         <activity android:name=".activity.PostActivity" />
         <activity android:name=".activity.ParticipantActivity" />
         <activity android:name=".activity.AssignmentActivity" />
@@ -48,9 +47,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-
         </activity>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 

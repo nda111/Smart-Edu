@@ -39,6 +39,7 @@ public class LectureListActivity extends AppCompatActivity {
     private ArrayList myLIDList = new ArrayList();
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
+    private static final int register_lec_requestCode = 2;
 
     private FirebaseDatabase fbDatabase = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -66,14 +67,46 @@ public class LectureListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        // 강의 추가 버튼 입력 이벤트
+        // Add lecture button event
         add_lec_btn = (ImageButton) findViewById(R.id.add_lecture_btn);
-
         add_lec_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LectureListActivity.this, AddLectureActivity.class);
-                startActivityForResult(intent, add_lec_requestCode);
+
+                // Find current user's position
+                final String userUID = mAuth.getUid();
+                dbReference = fbDatabase.getReference("Users");
+                dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot snap :snapshot.getChildren()) {
+                            String UID = snap.getKey();
+                            Log.e("UID", snap.child("user position").getValue().toString() );
+
+                            if(UID.equals(userUID)) {
+                                String userp = snap.child("user position").getValue().toString();
+                                Log.e("UID if", userp );
+                                // If Professor -> AddLectureActivity
+                                if (userp.equals("교수")) {
+                                    Intent intent = new Intent(LectureListActivity.this, AddLectureActivity.class);
+                                    startActivityForResult(intent, add_lec_requestCode);
+                                }
+                                // If Student -> RegisterLectureActivity
+                                else if (userp.equals("학생"))
+                                {
+                                    Intent intent = new Intent(LectureListActivity.this, RegisterLectureActivity.class);
+                                    startActivityForResult(intent, register_lec_requestCode);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+                    }
+                });
+
             }
         });
 
@@ -85,10 +118,9 @@ public class LectureListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(LectureListActivity.this, MessageListActivity.class);
                 startActivity(intent);
-                findMyLectureFromFirebaseDB();
             }
         });
-        
+
     }
 
 
@@ -149,8 +181,8 @@ public class LectureListActivity extends AppCompatActivity {
                    Log.e("Prof uid", snap.child("professor uid").getValue().toString());
 
                    if(myUID.equals(lecturePfUID)) {
-                       myLIDList.add(snap.getKey().toString());
-                       Log.e("LID", snap.getKey().toString());
+                       myLIDList.add(snap.getKey());
+                       Log.e("LID", snap.getKey());
                    }
                }
             }
