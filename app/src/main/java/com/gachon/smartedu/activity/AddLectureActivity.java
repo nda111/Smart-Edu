@@ -133,7 +133,7 @@ public class AddLectureActivity extends AppCompatActivity {
         final String gradePolicy = grade_spinner.getSelectedItem().toString().trim();
         final String pfUID = mAuth.getCurrentUser().getUid();
 
-        // Find current users name
+        // Create Lecture DB
         dbReference = fbDatabase.getReference("Users");
         dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

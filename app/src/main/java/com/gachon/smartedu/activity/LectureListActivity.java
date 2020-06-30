@@ -40,6 +40,7 @@ public class LectureListActivity extends AppCompatActivity {
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
     private static final int register_lec_requestCode = 2;
+    private Integer id;
 
     private FirebaseDatabase fbDatabase = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -52,6 +53,10 @@ public class LectureListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lecture_list);
+
+//        // Check user position
+//        checkUserPosition();
+      
 
         // Get my lecture list
         findMyLectureFromFirebaseDB();
@@ -178,11 +183,9 @@ public class LectureListActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                for (DataSnapshot snap :snapshot.getChildren()) {
                    String lecturePfUID = snap.child("professor uid").getValue().toString();
-                   Log.e("Prof uid", snap.child("professor uid").getValue().toString());
 
                    if(myUID.equals(lecturePfUID)) {
                        myLIDList.add(snap.getKey());
-                       Log.e("LID", snap.getKey());
                    }
                }
             }
@@ -218,9 +221,37 @@ public class LectureListActivity extends AppCompatActivity {
                 Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
             }
         });
-
-
     }
+
+//    // Check User : Professor or Student
+//    public void checkUserPosition() {
+//        final String myUID = mAuth.getCurrentUser().getUid();
+//
+//        dbReference = fbDatabase.getReference("Users");
+//        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot snap :snapshot.getChildren()) {
+//                    if(myUID.equals(snap.getKey())) {
+//                        if(snap.child("user position").getValue().toString().equals("학생"))
+//                        {
+//
+//                        }
+//                        else {
+//
+//                        }
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+//            }
+//        });
+//    }
+
 
 
 
