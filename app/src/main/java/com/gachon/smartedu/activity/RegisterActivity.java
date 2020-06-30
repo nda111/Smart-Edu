@@ -154,24 +154,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         });
 
-//        // 인증 버튼
-//        register_num_check = (Button) findViewById(R.id.register_num_check);
-//        register_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
-//
-//        // 이메일 중복 확인 버튼
-//        check_id =(Button) findViewById(R.id.check_id);
-//        check_id.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
-//
         // 가입 버튼
         register_btn = (Button) findViewById(R.id.register_btn);
         register_btn.setOnClickListener(new View.OnClickListener() {
@@ -190,7 +172,7 @@ public class RegisterActivity extends AppCompatActivity {
 //        updateUI(currentUser);
     }
 
-    //실질적으로 회원가입 진행
+    // Start register method
     private void register() {
 
         String email = register_email.getText().toString().trim();
@@ -273,7 +255,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    // 툴바 뒤로가기 버튼 활성화
+    // Activate back button in Toolbar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){

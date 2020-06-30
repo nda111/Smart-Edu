@@ -1,5 +1,7 @@
 package com.gachon.smartedu.activity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -9,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,6 +22,13 @@ import com.gachon.smartedu.Item.LectureListItem;
 import com.gachon.smartedu.R;
 import com.gachon.smartedu.adapter.RecyclerAdapter;
 import com.gachon.smartedu.messaging.activity.MessageListActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +36,14 @@ import java.util.List;
 public class LectureListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private ImageButton add_lec_btn, message_btn;
+    private ArrayList myLIDList = new ArrayList();
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
+
+    private FirebaseDatabase fbDatabase = FirebaseDatabase.getInstance();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private DatabaseReference dbReference;
+
 
     List<LectureListItem> list = new ArrayList<>();
 
@@ -35,6 +51,10 @@ public class LectureListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lecture_list);
+
+        // Get my lecture list
+        findMyLectureFromFirebaseDB();
+        getMyLecture();
 
         recyclerView = findViewById(R.id.lecture_rv);
 
@@ -65,10 +85,12 @@ public class LectureListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(LectureListActivity.this, MessageListActivity.class);
                 startActivity(intent);
+                findMyLectureFromFirebaseDB();
             }
         });
-
+        
     }
+
 
 
     // Toolbar에 menu 버튼 설정
@@ -112,6 +134,60 @@ public class LectureListActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    // Find my lectures and add LID in arraylist
+    private void findMyLectureFromFirebaseDB() {
+        final String myUID = mAuth.getCurrentUser().getUid();
+
+        dbReference = fbDatabase.getReference("LectureList");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+               for (DataSnapshot snap :snapshot.getChildren()) {
+                   String lecturePfUID = snap.child("professor uid").getValue().toString();
+                   Log.e("Prof uid", snap.child("professor uid").getValue().toString());
+
+                   if(myUID.equals(lecturePfUID)) {
+                       myLIDList.add(snap.getKey().toString());
+                       Log.e("LID", snap.getKey().toString());
+                   }
+               }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+            }
+        });
+    }
+
+    private void getMyLecture() {
+
+        dbReference = fbDatabase.getReference("LectureList");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap :snapshot.getChildren()) {
+                    String LID = snap.getKey().toString();
+
+                    if(myLIDList.contains(LID)) {
+                        list.add(new LectureListItem(snap.child("name").getValue().toString(),
+                                "학점: " + snap.child("credit").getValue().toString() +
+                                        " / 학생정원: " + snap.child("max participant").getValue().toString()));
+
+                        recyclerView.setAdapter(new RecyclerAdapter(list));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+            }
+        });
+
+
     }
 
 
