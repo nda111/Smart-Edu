@@ -1,5 +1,6 @@
 package com.gachon.smartedu.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -15,10 +16,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.gachon.smartedu.Item.UserItem;
 import com.gachon.smartedu.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -122,24 +127,44 @@ public class AddLectureActivity extends AppCompatActivity {
     }
 
     private void addLectureListToDB() {
-        String lectureName = lecture_name.getText().toString().trim();
-        String maxStudent = max_stu_num.getText().toString().trim();
-        String credit = credit_spinner.getSelectedItem().toString().trim();
-        String gradePolicy = grade_spinner.getSelectedItem().toString().trim();
-        String pfUID = mAuth.getCurrentUser().getUid();
+        final String lectureName = lecture_name.getText().toString().trim();
+        final String maxStudent = max_stu_num.getText().toString().trim();
+        final String credit = credit_spinner.getSelectedItem().toString().trim();
+        final String gradePolicy = grade_spinner.getSelectedItem().toString().trim();
+        final String pfUID = mAuth.getCurrentUser().getUid();
 
-        // Save the table in firebase DB
-        HashMap<Object,String> hashMap = new HashMap<>();
+        // Find current users name
+        dbReference = fbDatabase.getReference("Users");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap :snapshot.getChildren()) {
+                    Log.e("professorName",snap.child("name").getValue().toString());
+                    if(pfUID.equals(snap.getKey())) {
 
-        hashMap.put("name", lectureName);
-        hashMap.put("max participant", maxStudent);
-        hashMap.put("credit", credit);
-        hashMap.put("grade policy", gradePolicy);
-        hashMap.put("professor uid", pfUID);
+                        // Save the table in firebase DB
+                        HashMap<Object,String> hashMap = new HashMap<>();
+
+                        hashMap.put("name", lectureName);
+                        hashMap.put("professor name", snap.child("name").getValue().toString());
+                        hashMap.put("max participant", maxStudent);
+                        hashMap.put("credit", credit);
+                        hashMap.put("grade policy", gradePolicy);
+                        hashMap.put("professor uid", pfUID);
 
 
-        dbReference = fbDatabase.getReference("LectureList").push();
-        dbReference.setValue(hashMap);
+                        dbReference = fbDatabase.getReference("LectureList").push();
+                        dbReference.setValue(hashMap);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findUsersName", "loadPost:onCancelled", error.toException());
+            }
+        });
 
     }
 
