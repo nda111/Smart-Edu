@@ -160,7 +160,7 @@ public class LectureListActivity extends AppCompatActivity {
 //                lecturelist_drawer.
                 navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         menuItem.setChecked(true);
                         lecturelist_drawer.closeDrawers();
 
@@ -193,7 +193,8 @@ public class LectureListActivity extends AppCompatActivity {
 //            if(professor == true)
             list.add(new LectureListItem(data.getStringExtra("LectureName"),
                     "학점: " + data.getStringExtra("Credit") +
-                    " / 학생정원: " + data.getStringExtra("MaxNum")));
+                    " / 학생정원: " + data.getStringExtra("MaxNum"),
+                    null)); //새로운 과목에 대한 LID 가져와야 함
 
             recyclerView.setAdapter(new RecyclerAdapter(list));
 
@@ -237,7 +238,7 @@ public class LectureListActivity extends AppCompatActivity {
                     if(myLIDList.contains(LID)) {
                         list.add(new LectureListItem(snap.child("name").getValue().toString(),
                                 "학점: " + snap.child("credit").getValue().toString() +
-                                        " / 학생정원: " + snap.child("max participant").getValue().toString()));
+                                        " / 학생정원: " + snap.child("max participant").getValue().toString(),LID));
 
                         recyclerView.setAdapter(new RecyclerAdapter(list));
                     }

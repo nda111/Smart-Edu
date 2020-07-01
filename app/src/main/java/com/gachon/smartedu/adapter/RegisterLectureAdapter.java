@@ -94,11 +94,11 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
                             if(snap.getKey().equals(LID)){
                                 // Save the table in firebase DB
                                 HashMap<Object,String> hashMap = new HashMap<>();
-
                                 hashMap.put("UID", myUID);
-
+                                // 인원이 증가하도록 push 추가
                                 dbReference = fbDatabase.getReference("LectureList").child(LID);
-                                dbReference.child("member").setValue(hashMap);
+                                dbReference.child("member").push().setValue(hashMap);
+
                                 Toast.makeText(view.getContext(), "등록되었습니다",
                                         Toast.LENGTH_SHORT).show();
                                 viewHolder.registeredTxt.setVisibility(View.VISIBLE);

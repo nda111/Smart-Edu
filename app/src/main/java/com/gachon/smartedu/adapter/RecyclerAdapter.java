@@ -41,7 +41,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder>{
                 Intent intent = new Intent(v.getContext(), LectureDetailActivity.class);
 
                 intent.putExtra("LectureName",list.get(position).name);
-                // LID 추가 필요
+                // LID 추가
+                intent.putExtra("LID", list.get(position).lid);
 
                 v.getContext().startActivity(intent);
             }
