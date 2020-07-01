@@ -1,5 +1,7 @@
 package com.gachon.smartedu.adapter;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -119,6 +121,17 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
                                 Toast.makeText(view.getContext(), "등록되었습니다",
                                         Toast.LENGTH_SHORT).show();
                                 viewHolder.registeredTxt.setVisibility(View.VISIBLE);
+
+                                // Send Intent to LectureListActivity
+                                Intent resultIntent = new Intent();
+
+                                resultIntent.putExtra("LectureName", snap.child("name").getValue().toString());
+                                resultIntent.putExtra("Credit", snap.child("credit").getValue().toString());
+                                resultIntent.putExtra("GradePolicy", snap.child("grade policy").getValue().toString());
+                                resultIntent.putExtra("MaxNum", snap.child("max participant").getValue().toString());
+                                ((Activity)view.getContext()).setResult(200, resultIntent);
+
+                                ((Activity)view.getContext()).finish();
                                 break;
                             }
                         }
@@ -130,7 +143,6 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
                         Log.w("Register in", "loadPost:onCancelled", error.toException());
                     }
                 });
-
 
             }
         });
