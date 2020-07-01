@@ -58,12 +58,14 @@ public class ParticipantActivity extends AppCompatActivity {
                     String LID = snap.getKey().toString();
                     if(targetLID.contentEquals(LID)) {
                         // 수업을 신청한 학생들의 UID 모두 찾아서 리스트로!
-                        for (DataSnapshot snap1 : snap.getChildren()) {
-                            String UID = snap1.child("UID").getValue().toString();
-                            uidList.add(UID);
+                        Log.i(TAG, snap.child("member").getChildrenCount()+"");
+
+                        for(int i=0; i<snap.child("member").getChildrenCount(); i++) {
+                            String uID = snap.child("member").child("3").getValue().toString();
+                            uidList.add(uID);
                         }
-                        Log.d(TAG, "onDataChange: 44444444444444");
-                        Log.i(TAG, uidList.get(0));
+
+
 //                        recyclerView.setAdapter(new RecyclerAdapter(list));
                     }
                 }

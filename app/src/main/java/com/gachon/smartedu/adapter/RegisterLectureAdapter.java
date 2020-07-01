@@ -45,14 +45,12 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
             regMaxNum = itemView.findViewById(R.id.reg_maxNum);
             regBtn = itemView.findViewById(R.id.reg_btn);
             registeredTxt = itemView.findViewById(R.id.registered_txt);
-            Log.e("CustomViewHolder", "in");
 
         }
     }
 
 
     public RegisterLectureAdapter(List<RegisterLectureItem> list) {
-        Log.e("RegisterLectureAdapter", "in");
         this.list = list;
     }
 
@@ -60,7 +58,6 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
     @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Log.e("onCreateViwHolder", "in");
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.register_lecture_list_item, viewGroup, false);
 
         return new CustomViewHolder(view);
@@ -69,7 +66,6 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
 
     @Override
     public void onBindViewHolder(@NonNull final CustomViewHolder viewHolder, int position) {
-        Log.e("onBindViewHolder", "in");
         viewHolder.regLectureName.setText(list.get(position).lectureName);
         viewHolder.regPfName.setText("교수: " + list.get(position).pfName);
         viewHolder.regCredit.setText(list.get(position).credit);
@@ -93,11 +89,32 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
                             // Find this lecture and add current user
                             if(snap.getKey().equals(LID)){
                                 // Save the table in firebase DB
-                                HashMap<Object,String> hashMap = new HashMap<>();
-                                hashMap.put("UID", myUID);
-                                // 인원이 증가하도록 push 추가
+                                Integer checkNum = 0;
+
+                                if(snap.child("member").getValue() != null){
+                                    for (DataSnapshot check : snap.child("member").getChildren()){
+                                        if(check.getValue().equals(myUID)){
+                                            checkNum = 1;
+                                        }
+                                    }
+                                }
+
                                 dbReference = fbDatabase.getReference("LectureList").child(LID);
-                                dbReference.child("member").push().setValue(hashMap);
+                                if(snap.child("member").getValue() == null)
+                                {
+                                    dbReference.child("member").child("1").setValue(myUID);
+                                }
+                                else if(checkNum == 1){
+                                    Toast.makeText(view.getContext(), "이미 등록한 강의입니다다",
+                                           Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                else{
+                                    Long i = snap.child("member").getChildrenCount()+1;
+                                    dbReference.child("member").child(i.toString()).setValue(myUID);
+                                }
+
+
 
                                 Toast.makeText(view.getContext(), "등록되었습니다",
                                         Toast.LENGTH_SHORT).show();
