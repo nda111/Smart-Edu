@@ -42,6 +42,7 @@ public class LectureListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private ImageButton add_lec_btn, message_btn;
     private ArrayList myLIDList = new ArrayList();
+    private Integer myUserInfo;
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
     private static final int register_lec_requestCode = 2;
@@ -60,12 +61,9 @@ public class LectureListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lecture_list);
         mContext = getApplicationContext();
 
-//        // Check user position
-//        checkUserPosition();
-
-
         // Get my lecture list
-        findMyLectureFromFirebaseDB();
+        findMyLectureFromFirebaseDB(); // If professor, get my lecture list
+        findMyRegisteredLectureFromFirebaseDB(); // If Student, get my registered lecture list
         getMyLecture();
 
         recyclerView = findViewById(R.id.lecture_rv);
@@ -146,42 +144,42 @@ public class LectureListActivity extends AppCompatActivity {
         return true;
     }
 
-    // Menu Item click event
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        final DrawerLayout lecturelist_drawer = findViewById(R.id.lecturelist_drawer);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-        switch(item.getItemId())
-        {
-            case R.id.toolbar_menu:
-                lecturelist_drawer.openDrawer(GravityCompat.END);
-//                lecturelist_drawer.
-                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        lecturelist_drawer.closeDrawers();
-
-                        int id = menuItem.getItemId();
-                        String title = menuItem.getTitle().toString();
-
-                        if(id == R.id.logout){
-                            FirebaseAuth.getInstance().signOut();
-                            Log.d(TAG, "onNavigationItemSelected: 로그아웃 시도중");
-                            finish();
-                        }
-
-                        return true;
-                    }
-                });
-
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    // Menu Item click event
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item)
+//    {
+//        final DrawerLayout lecturelist_drawer = findViewById(R.id.lecturelist_drawer);
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//
+//        switch(item.getItemId())
+//        {
+//            case R.id.toolbar_menu:
+//                lecturelist_drawer.openDrawer(GravityCompat.END);
+////                lecturelist_drawer.
+//                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//                    @Override
+//                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+//                        menuItem.setChecked(true);
+//                        lecturelist_drawer.closeDrawers();
+//
+//                        int id = menuItem.getItemId();
+//                        String title = menuItem.getTitle().toString();
+//
+//                        if(id == R.id.logout){
+//                            FirebaseAuth.getInstance().signOut();
+//                            Log.d(TAG, "onNavigationItemSelected: 로그아웃 시도중");
+//                            finish();
+//                        }
+//
+//                        return true;
+//                    }
+//                });
+//
+//                break;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     // AddLectureActivity result 받아오기
     @Override
@@ -201,8 +199,11 @@ public class LectureListActivity extends AppCompatActivity {
         }
     }
 
-    // Find my lectures and add LID in arraylist
+    // Find my lectures and add LID in arraylist (Professor)
     private void findMyLectureFromFirebaseDB() {
+        checkUserPosition();
+
+
         final String myUID = mAuth.getCurrentUser().getUid();
 
         dbReference = fbDatabase.getReference("LectureList");
@@ -210,10 +211,16 @@ public class LectureListActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                for (DataSnapshot snap :snapshot.getChildren()) {
+                   // If Student position, return
+                   if(myUserInfo == 0){
+                       return;
+                   }
+
                    String lecturePfUID = snap.child("professor uid").getValue().toString();
 
                    if(myUID.equals(lecturePfUID)) {
                        myLIDList.add(snap.getKey());
+                       Log.e("add","1");
                    }
                }
             }
@@ -225,21 +232,75 @@ public class LectureListActivity extends AppCompatActivity {
         });
     }
 
-    private void getMyLecture() {
+    // Find my registered lectures and add LID in arraylist (Student)
+    private void findMyRegisteredLectureFromFirebaseDB() {
+        checkUserPosition();
+
+        final String myUID = mAuth.getCurrentUser().getUid();
 
         dbReference = fbDatabase.getReference("LectureList");
         dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snap :snapshot.getChildren()) {
-                    String LID = snap.getKey().toString();
+                    // If professor position, return
+                    if(myUserInfo == 1){
+                        return;
+                    }
 
-                    if(myLIDList.contains(LID)) {
-                        list.add(new LectureListItem(snap.child("name").getValue().toString(),
-                                "학점: " + snap.child("credit").getValue().toString() +
-                                        " / 학생정원: " + snap.child("max participant").getValue().toString()));
+                    for(DataSnapshot check : snap.child("member").getChildren())
+                    {
 
-                        recyclerView.setAdapter(new RecyclerAdapter(list));
+                        if(check.getValue().equals(myUID)) {
+                            myLIDList.add(snap.getKey());
+                            Log.e("check", "1");
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+            }
+        });
+    }
+
+
+
+    private void getMyLecture() {
+        checkUserPosition();
+
+        dbReference = fbDatabase.getReference("LectureList");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap :snapshot.getChildren()) {
+                    String LID = snap.getKey();
+
+                    // If Student, get registered lectures
+                    if(myUserInfo == 0){
+                        findMyRegisteredLectureFromFirebaseDB();
+
+                        if(myLIDList.contains(LID)) {
+                            list.add(new LectureListItem(snap.child("name").getValue().toString(),
+                                    "학점: " + snap.child("credit").getValue().toString() +
+                                            " / 학생정원: " + snap.child("max participant").getValue().toString()));
+
+                            recyclerView.setAdapter(new RecyclerAdapter(list));
+                        }
+                    }
+                    // If Professor, get my lectures
+                    else if(myUserInfo == 1){
+
+                        if(myLIDList.contains(LID)) {
+                            list.add(new LectureListItem(snap.child("name").getValue().toString(),
+                                    "학점: " + snap.child("credit").getValue().toString() +
+                                            " / 학생정원: " + snap.child("max participant").getValue().toString()));
+
+                            recyclerView.setAdapter(new RecyclerAdapter(list));
+                        }
                     }
                 }
             }
@@ -251,34 +312,36 @@ public class LectureListActivity extends AppCompatActivity {
         });
     }
 
-//    // Check User : Professor or Student
-//    public void checkUserPosition() {
-//        final String myUID = mAuth.getCurrentUser().getUid();
-//
-//        dbReference = fbDatabase.getReference("Users");
-//        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot snap :snapshot.getChildren()) {
-//                    if(myUID.equals(snap.getKey())) {
-//                        if(snap.child("user position").getValue().toString().equals("학생"))
-//                        {
-//
-//                        }
-//                        else {
-//
-//                        }
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
-//            }
-//        });
-//    }
+
+    // Check User : Professor or Student
+    private void checkUserPosition() {
+        final String myUID = mAuth.getCurrentUser().getUid();
+
+        dbReference = fbDatabase.getReference("Users");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap :snapshot.getChildren()) {
+                    if(myUID.equals(snap.getKey())) {
+                        if(snap.child("user position").getValue().toString().equals("학생"))
+                        {
+                            myUserInfo = 0;
+                        }
+                        else {
+                            myUserInfo = 1;
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findMyLecture", "loadPost:onCancelled", error.toException());
+            }
+        });
+    }
+
 
 
 
