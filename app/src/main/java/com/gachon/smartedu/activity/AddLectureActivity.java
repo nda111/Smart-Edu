@@ -88,7 +88,7 @@ public class AddLectureActivity extends AppCompatActivity {
         lecture_name = (EditText) findViewById(R.id.lecture_name);
         max_stu_num = (EditText) findViewById(R.id.max_stu_num);
 
-        // 강의 개설 버튼 입력 이벤트
+        // Ad lecture button event
         add_btn = (Button) findViewById(R.id.add_btn);
 
         add_btn.setOnClickListener(new View.OnClickListener(){

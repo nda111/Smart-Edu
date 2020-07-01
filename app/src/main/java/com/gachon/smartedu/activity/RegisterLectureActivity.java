@@ -37,6 +37,7 @@ public class RegisterLectureActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.register_lecture_rv);
 
 
+        // 개설된 강좌리스트 DB로부터 받아오기
         dbReference = fbDatabase.getReference("LectureList");
         dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -59,11 +60,6 @@ public class RegisterLectureActivity extends AppCompatActivity {
                 Log.w("findRegisterLectureList", "loadPost:onCancelled", error.toException());
             }
         });
-
-
-
-
-
 
     }
 }

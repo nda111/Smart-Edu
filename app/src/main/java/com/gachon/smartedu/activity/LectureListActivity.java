@@ -45,6 +45,7 @@ public class LectureListActivity extends AppCompatActivity {
     private Integer myUserInfo;
     private static final int add_lec_requestCode = 1;
     private static final int add_lec_resultCode = 100;
+    private static final int reg_lec_resultCode = 200;
     private static final int register_lec_requestCode = 2;
     private Integer id;
     private Context mContext;
@@ -217,13 +218,13 @@ public class LectureListActivity extends AppCompatActivity {
 //        return super.onOptionsItemSelected(item);
 //    }
 
-    // AddLectureActivity result 받아오기
+    // Get AddLectureActivity result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == add_lec_requestCode && resultCode == add_lec_resultCode) {
-            // Professor: 받아온 result로 lecture 생성
+            // Professor: create lecture with intent data
 //            if(professor == true)
             list.add(new LectureListItem(data.getStringExtra("LectureName"),
                     "학점: " + data.getStringExtra("Credit") +
@@ -231,8 +232,13 @@ public class LectureListActivity extends AppCompatActivity {
                     null)); //새로운 과목에 대한 LID 가져와야 함
 
             recyclerView.setAdapter(new RecyclerAdapter(list));
+        }
+        else if (requestCode == register_lec_requestCode && resultCode == reg_lec_resultCode){
+            list.add(new LectureListItem(data.getStringExtra("LectureName"),
+                    "학점: " + data.getStringExtra("Credit") +
+                            " / 학생정원: " + data.getStringExtra("MaxNum")));
 
-
+            recyclerView.setAdapter(new RecyclerAdapter(list));
         }
     }
 
