@@ -77,8 +77,8 @@ public class ParticipantActivity extends AppCompatActivity {
                             isProfessor = false;
                         }
                         // 수업을 신청한 학생들의 UID 모두 찾아서 리스트로!
-                        for(int i=0; i<snap.child("member").getChildrenCount(); i++) {
-                            String uID = snap.child("member").child(Integer.toString(i+1)).getValue().toString();
+                        for(DataSnapshot check : snap.child("member").getChildren()) {
+                            String uID = check.getValue().toString();
                             uidList.add(uID);
                         }
                     }
