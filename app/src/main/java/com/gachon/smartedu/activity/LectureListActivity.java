@@ -56,7 +56,7 @@ public class LectureListActivity extends AppCompatActivity {
 
 //        // Check user position
 //        checkUserPosition();
-      
+
 
         // Get my lecture list
         findMyLectureFromFirebaseDB();
