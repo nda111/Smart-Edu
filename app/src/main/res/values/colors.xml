@@ -6,4 +6,6 @@
     <color name="gray">#D3CCCC</color>
     <color name="darkSmartedu">#1B78C3</color>
     <color name="smartedu">#A1E2FF</color>
+    <color name="exit">#F8695F</color>
+    <color name="exitpress">#A63030</color>
 </resources>

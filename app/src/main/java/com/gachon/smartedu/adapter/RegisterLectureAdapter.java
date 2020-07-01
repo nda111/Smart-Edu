@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gachon.smartedu.Item.RegisterLectureItem;
 import com.gachon.smartedu.R;
-import com.gachon.smartedu.activity.RegisterActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,7 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
-import java.util.HashMap;
 import java.util.List;
 
 public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLectureAdapter.CustomViewHolder> {
@@ -72,7 +70,7 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
         viewHolder.regPfName.setText("교수: " + list.get(position).pfName);
         viewHolder.regCredit.setText(list.get(position).credit);
         viewHolder.regGradeP.setText(list.get(position).gradeP);
-        viewHolder.regMaxNum.setText("학생정원: " + list.get(position).maxNum + "/");
+        viewHolder.regMaxNum.setText("학생정원: " + " / " + list.get(position).maxNum );
 
         final String LID = list.get(position).LID;
 
@@ -100,26 +98,20 @@ public class RegisterLectureAdapter extends RecyclerView.Adapter<RegisterLecture
                                         }
                                     }
                                 }
-
                                 dbReference = fbDatabase.getReference("LectureList").child(LID);
-                                if(snap.child("member").getValue() == null)
-                                {
-                                    dbReference.child("member").child("1").setValue(myUID);
-                                }
-                                else if(checkNum == 1){
-                                    Toast.makeText(view.getContext(), "이미 등록한 강의입니다다",
+                               if(checkNum == 1){
+                                    Toast.makeText(view.getContext(), "이미 등록한 강의입니다",
                                            Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                                 else{
-                                    Long i = snap.child("member").getChildrenCount()+1;
-                                    dbReference.child("member").child(i.toString()).setValue(myUID);
+                                    dbReference.child("member").child(myUID).setValue(myUID);
                                 }
-
-
 
                                 Toast.makeText(view.getContext(), "등록되었습니다",
                                         Toast.LENGTH_SHORT).show();
+
+                                // Set Visible registered Text
                                 viewHolder.registeredTxt.setVisibility(View.VISIBLE);
 
                                 // Send Intent to LectureListActivity

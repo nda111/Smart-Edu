@@ -226,7 +226,7 @@ public class LectureListActivity extends AppCompatActivity {
 
                    if(myUID.equals(lecturePfUID)) {
                        myLIDList.add(snap.getKey());
-                       Log.e("add","1");
+
                    }
                }
             }
@@ -259,7 +259,6 @@ public class LectureListActivity extends AppCompatActivity {
 
                         if(check.getValue().equals(myUID)) {
                             myLIDList.add(snap.getKey());
-                            Log.e("check", "1");
                         }
                     }
 

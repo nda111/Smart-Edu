@@ -100,11 +100,9 @@ public class AddLectureActivity extends AppCompatActivity {
                 try{
                     if(lecture_name.getEditableText().toString().getBytes().length <= 0 || max_stu_num.getEditableText().toString().getBytes().length <= 0
                             || Integer.parseInt(max_stu_num.getEditableText().toString()) <= 0){
-                        Log.e("Toast", "test");
                         Toast.makeText(AddLectureActivity.this, "항목을 올바르게 채워주세요", Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        Log.e("Intent", lecture_name.getEditableText().toString());
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("LectureName", lecture_name.getEditableText().toString());
                         resultIntent.putExtra("Credit", credit_spinner.getSelectedItem().toString());
@@ -139,7 +137,6 @@ public class AddLectureActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snap :snapshot.getChildren()) {
-                    Log.e("professorName",snap.child("name").getValue().toString());
                     if(pfUID.equals(snap.getKey())) {
 
                         // Save the table in firebase DB
@@ -151,7 +148,6 @@ public class AddLectureActivity extends AppCompatActivity {
                         hashMap.put("credit", credit);
                         hashMap.put("grade policy", gradePolicy);
                         hashMap.put("professor uid", pfUID);
-
 
                         dbReference = fbDatabase.getReference("LectureList").push();
                         dbReference.setValue(hashMap);
