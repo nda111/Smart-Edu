@@ -145,42 +145,6 @@ public class LectureListActivity extends AppCompatActivity {
         return true;
     }
 
-    // Menu Item click event
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        final DrawerLayout lecturelist_drawer = findViewById(R.id.lecturelist_drawer);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-        switch(item.getItemId())
-        {
-            case R.id.toolbar_menu:
-                lecturelist_drawer.openDrawer(GravityCompat.END);
-//                lecturelist_drawer.
-                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        lecturelist_drawer.closeDrawers();
-
-                        int id = menuItem.getItemId();
-                        String title = menuItem.getTitle().toString();
-
-                        if(id == R.id.logout){
-                            FirebaseAuth.getInstance().signOut();
-                            Log.d(TAG, "onNavigationItemSelected: 로그아웃 시도중");
-                            finish();
-                        }
-
-                        return true;
-                    }
-                });
-
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 //    // Menu Item click event
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item)
@@ -229,14 +193,14 @@ public class LectureListActivity extends AppCompatActivity {
             list.add(new LectureListItem(data.getStringExtra("LectureName"),
                     "학점: " + data.getStringExtra("Credit") +
                     " / 학생정원: " + data.getStringExtra("MaxNum"),
-                    null)); //새로운 과목에 대한 LID 가져와야 함
+                    null)); //새로 추가한 과목에 대한 LID 가져와야 함
 
             recyclerView.setAdapter(new RecyclerAdapter(list));
         }
         else if (requestCode == register_lec_requestCode && resultCode == reg_lec_resultCode){
             list.add(new LectureListItem(data.getStringExtra("LectureName"),
                     "학점: " + data.getStringExtra("Credit") +
-                            " / 학생정원: " + data.getStringExtra("MaxNum")));
+                            " / 학생정원: " + data.getStringExtra("MaxNum"),null));
 
             recyclerView.setAdapter(new RecyclerAdapter(list));
         }
