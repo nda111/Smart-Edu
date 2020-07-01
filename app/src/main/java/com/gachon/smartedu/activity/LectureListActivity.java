@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,11 +18,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.gachon.smartedu.Item.LectureListItem;
 import com.gachon.smartedu.R;
 import com.gachon.smartedu.adapter.RecyclerAdapter;
 import com.gachon.smartedu.messaging.activity.MessageListActivity;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LectureListActivity extends AppCompatActivity {
+
+    private final static String TAG = "LectureListActivity";
     RecyclerView recyclerView;
     private ImageButton add_lec_btn, message_btn;
     private ArrayList myLIDList = new ArrayList();
@@ -41,11 +46,11 @@ public class LectureListActivity extends AppCompatActivity {
     private static final int add_lec_resultCode = 100;
     private static final int register_lec_requestCode = 2;
     private Integer id;
+    private Context mContext;
 
     private FirebaseDatabase fbDatabase = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference dbReference;
-
 
     List<LectureListItem> list = new ArrayList<>();
 
@@ -53,6 +58,7 @@ public class LectureListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lecture_list);
+        mContext = getApplicationContext();
 
 //        // Check user position
 //        checkUserPosition();
@@ -144,11 +150,33 @@ public class LectureListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        DrawerLayout lecturelist_drawer = findViewById(R.id.lecturelist_drawer);
+        final DrawerLayout lecturelist_drawer = findViewById(R.id.lecturelist_drawer);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         switch(item.getItemId())
         {
             case R.id.toolbar_menu:
                 lecturelist_drawer.openDrawer(GravityCompat.END);
+//                lecturelist_drawer.
+                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        lecturelist_drawer.closeDrawers();
+
+                        int id = menuItem.getItemId();
+                        String title = menuItem.getTitle().toString();
+
+                        if(id == R.id.logout){
+                            FirebaseAuth.getInstance().signOut();
+                            Log.d(TAG, "onNavigationItemSelected: 로그아웃 시도중");
+                            finish();
+                        }
+
+                        return true;
+                    }
+                });
+
                 break;
         }
 
