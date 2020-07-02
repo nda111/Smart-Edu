@@ -20,11 +20,10 @@ public class MessageTest {
      */
     @Test
     public void testConstruction() {
-        final Message message = new Message(-1, "from", "from_email", "title", "content", 10);
+        final Message message = new Message("id", "from", "title", "content", 10);
 
-        assert message.getId() == -1;
+        assert message.getId().equals("id");
         assert message.getFrom().equals("from");
-        assert message.getFromEmail().equals("from_email");
         assert message.getTitle().equals("title");
         assert message.getContent().equals("content");
         assert message.getWhen() == 10;
