@@ -22,8 +22,8 @@ public class LectureDetailActivity extends AppCompatActivity {
         // Get Lecture Name, Lecture LID
         Intent intent = getIntent();
 
-        String name = intent.getExtras().getString("LectureName");
-        // String LID = intetn.getExtras().getString("LID");
+        final String name = intent.getExtras().getString("LectureName");
+        final String LID = intent.getExtras().getString("LID");
 
         participant = findViewById(R.id.participant);
         post = findViewById(R.id.post);
@@ -34,7 +34,7 @@ public class LectureDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LectureDetailActivity.this, ParticipantActivity.class);
-
+                intent.putExtra("LID", LID);
                 startActivity(intent);
                 }
             });

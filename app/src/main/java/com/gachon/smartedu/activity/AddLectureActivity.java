@@ -1,5 +1,6 @@
 package com.gachon.smartedu.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -15,18 +16,32 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.gachon.smartedu.Item.UserItem;
 import com.gachon.smartedu.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class AddLectureActivity extends AppCompatActivity {
     private Button add_btn;
     private static final int add_lec_resultCode = 100;
+    private EditText lecture_name, max_stu_num;
+    private Spinner credit_spinner, grade_spinner;
+    private FirebaseDatabase fbDatabase = FirebaseDatabase.getInstance();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private DatabaseReference dbReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_lecture);
 
-        // 툴바에 뒤로가기 버튼 만들기
+        // Activate back button in Toolbar
         Toolbar toolBar = findViewById(R.id.add_lecture_toolbar);
         setSupportActionBar(toolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -34,8 +49,8 @@ public class AddLectureActivity extends AppCompatActivity {
         final String[] credit_items = {"1학점", "2학점", "3학점", "4학점", "P/F"};
         final String[] grade_pc_items = {"상대평가", "절대평가"};
 
-        // 학점 spinner 설정
-        final Spinner credit_spinner = (Spinner) findViewById(R.id.credit_spinener);
+        // Set Credit spinner
+        credit_spinner = (Spinner) findViewById(R.id.credit_spinener);
         ArrayAdapter<String> credit_adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, credit_items);
         credit_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         credit_spinner.setAdapter(credit_adapter);
@@ -52,8 +67,8 @@ public class AddLectureActivity extends AppCompatActivity {
             }
         });
 
-        // 평가방법 spinner 설정
-        final Spinner grade_spinner = (Spinner) findViewById(R.id.gd_policy_spinener);
+        // Set grading policy spinner
+        grade_spinner = (Spinner) findViewById(R.id.gd_policy_spinener);
         ArrayAdapter<String> grade_adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, grade_pc_items);
         grade_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         grade_spinner.setAdapter(grade_adapter);
@@ -70,10 +85,11 @@ public class AddLectureActivity extends AppCompatActivity {
             }
         });
 
-        // 강의 개설 버튼 입력 이벤트
+        lecture_name = (EditText) findViewById(R.id.lecture_name);
+        max_stu_num = (EditText) findViewById(R.id.max_stu_num);
+
+        // Ad lecture button event
         add_btn = (Button) findViewById(R.id.add_btn);
-        final EditText lecture_name = findViewById(R.id.lecture_name);
-        final EditText max_num = findViewById(R.id.max_stu_num);
 
         add_btn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -82,19 +98,21 @@ public class AddLectureActivity extends AppCompatActivity {
 
                 // Check error case
                 try{
-                    if(lecture_name.getEditableText().toString().getBytes().length <= 0 || max_num.getEditableText().toString().getBytes().length <= 0
-                            || Integer.parseInt(max_num.getEditableText().toString()) <= 0){
-                        Log.e("Toast", "test");
+                    if(lecture_name.getEditableText().toString().getBytes().length <= 0 || max_stu_num.getEditableText().toString().getBytes().length <= 0
+                            || Integer.parseInt(max_stu_num.getEditableText().toString()) <= 0){
                         Toast.makeText(AddLectureActivity.this, "항목을 올바르게 채워주세요", Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        Log.e("Intent", lecture_name.getEditableText().toString());
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("LectureName", lecture_name.getEditableText().toString());
                         resultIntent.putExtra("Credit", credit_spinner.getSelectedItem().toString());
                         resultIntent.putExtra("GradePolicy", grade_spinner.getSelectedItem().toString());
-                        resultIntent.putExtra("MaxNum", max_num.getEditableText().toString());
+                        resultIntent.putExtra("MaxNum", max_stu_num.getEditableText().toString());
                         setResult(add_lec_resultCode, resultIntent);
+
+                        // Create New Lecture in DB
+                        addLectureListToDB();
+
                         finish();
                     }
 
@@ -104,6 +122,46 @@ public class AddLectureActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void addLectureListToDB() {
+        final String lectureName = lecture_name.getText().toString().trim();
+        final String maxStudent = max_stu_num.getText().toString().trim();
+        final String credit = credit_spinner.getSelectedItem().toString().trim();
+        final String gradePolicy = grade_spinner.getSelectedItem().toString().trim();
+        final String pfUID = mAuth.getCurrentUser().getUid();
+
+        // Create Lecture DB
+        dbReference = fbDatabase.getReference("Users");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap :snapshot.getChildren()) {
+                    if(pfUID.equals(snap.getKey())) {
+
+                        // Save the table in firebase DB
+                        HashMap<Object,String> hashMap = new HashMap<>();
+
+                        hashMap.put("name", lectureName);
+                        hashMap.put("professor name", snap.child("name").getValue().toString());
+                        hashMap.put("max participant", maxStudent);
+                        hashMap.put("credit", credit);
+                        hashMap.put("grade policy", gradePolicy);
+                        hashMap.put("professor uid", pfUID);
+
+                        dbReference = fbDatabase.getReference("LectureList").push();
+                        dbReference.setValue(hashMap);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("findUsersName", "loadPost:onCancelled", error.toException());
+            }
+        });
+
     }
 
     // 툴바 뒤로가기 버튼 활성화
