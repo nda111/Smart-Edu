@@ -1,4 +1,4 @@
-package com.gachon.smartedu;
+package com.gachon.smartedu.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gachon.smartedu.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -77,31 +78,40 @@ public class LoginActivity extends AppCompatActivity {
         String email = login_id.getText().toString().trim();
         String password = login_pw.getText().toString().trim();
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                // Name
-                                String name = user.getDisplayName();
-                                Toast.makeText(LoginActivity.this, name, Toast.LENGTH_SHORT).show();
+        if (email.length() < 1) {
+            Toast.makeText(LoginActivity.this, "이메일을 입력하세요",
+                    Toast.LENGTH_SHORT).show();
+        } else if (password.length() < 1) {
+            Toast.makeText(LoginActivity.this, "비밀번호를 입력하세요",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success");
+
+                                Toast.makeText(LoginActivity.this, "로그인 성공!", Toast.LENGTH_SHORT).show();
+                                // Call LectureList Activity
+                                Intent intent = new Intent(LoginActivity.this, LectureListActivity.class);
+                                startActivity(intent);
+                                finish();
+
+                                //UI
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                Toast.makeText(LoginActivity.this, "가입된 사용자가 아닙니다",
+                                        Toast.LENGTH_SHORT).show();
+                                //UI
+                                // ...
                             }
-                            //UI
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            //UI
+
                             // ...
                         }
-
-                        // ...
-                    }
-                });
+                    });
+        }
     }
 }

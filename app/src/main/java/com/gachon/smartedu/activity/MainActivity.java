@@ -1,8 +1,10 @@
-package com.gachon.smartedu;
+package com.gachon.smartedu.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.gachon.smartedu.R;
 
 public class MainActivity extends AppCompatActivity {
 
